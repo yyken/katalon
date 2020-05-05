@@ -1,0 +1,32 @@
+#!/bin/bash
+XVFB=/usr/bin/Xvfb
+PIDFILE=/var/run/xvfb.pid
+
+SCREEN_SIZE='1024x768x24'
+if [ -n "$XVFB_SCREEN_SIZE" ]; then
+    SCREEN_SIZE="$XVFB_SCREEN_SIZE"
+fi
+
+XVFBARGS="$DISPLAY -screen 0 $SCREEN_SIZE -ac +extension GLX +extension RANDR +render -noreset"
+
+case "$1" in
+  start)
+    echo -n "Starting virtual X frame buffer: Xvfb"
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile --background --exec $XVFB -- $XVFBARGS
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping virtual X frame buffer: Xvfb"
+    start-stop-daemon --stop --quiet --pidfile $PIDFILE
+    echo "."
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  *)
+        echo "Usage: /etc/init.d/xvfb {start|stop|restart}"
+        exit 1
+esac
+
+exit 0
